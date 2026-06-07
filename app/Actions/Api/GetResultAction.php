@@ -18,7 +18,7 @@ final class GetResultAction
         return ResponseFactory::json($response, [
             'status' => 'placeholder',
             'action' => 'get-result',
-            'id' => $args['id'] ?? null,
+            'public_id' => $args['public_id'] ?? null,
         ]);
     }
 }
