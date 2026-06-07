@@ -95,6 +95,22 @@ final class Answer
         return $this->deletedAt;
     }
 
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'question_id' => $this->questionId,
+            'code' => $this->code,
+            'text' => $this->text,
+            'weights' => $this->weights,
+            'sort_order' => $this->sortOrder,
+            'is_active' => $this->isActive,
+            'created_at' => $this->createdAt?->format(DATE_ATOM),
+            'updated_at' => $this->updatedAt?->format(DATE_ATOM),
+            'deleted_at' => $this->deletedAt?->format(DATE_ATOM),
+        ];
+    }
+
     private function assertValid(): void
     {
         if ($this->questionId <= 0) {
