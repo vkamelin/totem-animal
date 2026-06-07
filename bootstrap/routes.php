@@ -6,6 +6,7 @@ use App\Actions\Admin\DashboardAction;
 use App\Actions\Api\FinishTestAction;
 use App\Actions\Api\GetResultAction;
 use App\Actions\Api\HealthAction;
+use App\Actions\Api\MeAction;
 use App\Actions\Api\StartTestAction;
 use App\Actions\Api\SubmitAnswerAction;
 use App\Infrastructure\RateLimit\RateLimiter;
@@ -26,6 +27,7 @@ $vkSignatureMiddleware = new VkSignatureMiddleware(Env::string('VK_APP_SECRET', 
 return static function (App $app) use ($rateLimiterMiddleware, $vkSignatureMiddleware): void {
     $app->group('/api', static function (RouteCollectorProxy $group) use ($rateLimiterMiddleware, $vkSignatureMiddleware): void {
         $group->get('/health', HealthAction::class)->add($rateLimiterMiddleware);
+        $group->post('/me', MeAction::class);
         $group->post('/test/start', StartTestAction::class)
             ->add($rateLimiterMiddleware)
             ->add($vkSignatureMiddleware);
