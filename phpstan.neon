@@ -1,0 +1,10 @@
+parameters:
+    level: max
+    paths:
+        - app
+        - tests
+    parallel:
+        maximumNumberOfProcesses: 1
+    bootstrapFiles:
+        - vendor/autoload.php
+    tmpDir: runtime/cache/phpstan
