@@ -1,6 +1,6 @@
 # Totem Animal
 
-VK Mini App built with PHP 8.4+, Slim 4, PHP-DI, Illuminate Database, Phinx, Monolog, Symfony Validator, PHPStan, and PHP CS Fixer.
+VK Mini App backend built with PHP 8.4+, Slim 4, PHP-DI, Illuminate Database, Phinx, Monolog, Symfony Validator, PHPStan, and PHP CS Fixer.
 
 ## Install
 
@@ -24,3 +24,16 @@ composer migrate
 composer migrate:rollback
 composer dump
 ```
+
+## Migrations
+
+Created Phinx migration files:
+
+- `database/migrations/20260607000100_create_app_clients_table.php`
+- `database/migrations/20260607000200_create_animals_table.php`
+- `database/migrations/20260607000300_create_questions_table.php`
+- `database/migrations/20260607000400_create_answers_table.php`
+- `database/migrations/20260607000500_create_test_sessions_table.php`
+- `database/migrations/20260607000600_create_test_session_answers_table.php`
+- `database/migrations/20260607000700_create_test_results_table.php`
+- `database/migrations/20260607000800_create_result_events_table.php`

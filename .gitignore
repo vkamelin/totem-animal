@@ -9,8 +9,6 @@
 !/runtime/.gitkeep
 !/runtime/logs/.gitkeep
 !/runtime/cache/.gitkeep
-/database/migrations/*
-!/database/migrations/.gitkeep
 /database/seeds/*
 !/database/seeds/.gitkeep
 /tests/Feature/*
