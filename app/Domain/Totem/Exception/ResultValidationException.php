@@ -1,0 +1,11 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Domain\Totem\Exception;
+
+use InvalidArgumentException;
+
+final class ResultValidationException extends InvalidArgumentException
+{
+}
