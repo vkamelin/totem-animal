@@ -11,3 +11,5 @@
 !/runtime/cache/.gitkeep
 /tests/Feature/*
 !/tests/Feature/.gitkeep
+/miniapp/node_modules/
+/miniapp/dist/

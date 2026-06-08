@@ -18,14 +18,14 @@ const API_BASE_URL = '/api';
 const REQUEST_TIMEOUT_MS = 15_000;
 
 function createApiError(
-  code: ApiClientError['code'],
+  code: ApiClientError['code'] | string,
   message: string,
   status: number,
   details?: unknown,
 ): ApiClientError {
   const error = new Error(message) as ApiClientError;
   error.name = 'ApiClientError';
-  error.code = code;
+  error.code = code as ApiClientError['code'];
   error.status = status;
   error.details = details;
   error.isApiError = true;

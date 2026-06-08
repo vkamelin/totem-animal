@@ -1,3 +1,5 @@
+import type { AppearanceType } from '@vkontakte/vk-bridge';
+
 export interface VkLaunchParams {
   vk_app_id?: string;
   vk_are_notifications_enabled?: string;
@@ -13,7 +15,7 @@ export interface VkLaunchParams {
 }
 
 export interface VkViewSettings {
-  status_bar_style?: 'light' | 'dark';
+  status_bar_style: AppearanceType;
   action_bar_color?: string;
   navigation_bar_color?: string;
 }

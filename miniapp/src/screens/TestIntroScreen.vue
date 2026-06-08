@@ -41,7 +41,7 @@ function normalizeResult(result: NullableTotemResult): TotemResult | null {
   return null;
 }
 
-async function ensurePublicId() {
+async function ensurePublicId(): Promise<string> {
   if (userStore.publicId) {
     return userStore.publicId;
   }
@@ -50,7 +50,7 @@ async function ensurePublicId() {
   userStore.setPublicId(response.data.public_id);
   const maybeResult = normalizeResult(response.data.result);
   if (maybeResult) {
-    return userStore.publicId;
+    return response.data.public_id;
   }
 
   return response.data.public_id;
