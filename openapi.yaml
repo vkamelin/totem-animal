@@ -1,0 +1,1023 @@
+openapi: 3.1.0
+info:
+  title: Totem Animal API
+  version: 1.0.0
+  description: API for VK Mini App "Totem Animal".
+servers:
+  - url: /
+    description: Current host
+tags:
+  - name: Health
+  - name: Client
+  - name: Test
+  - name: Result
+paths:
+  /api/health:
+    get:
+      tags:
+        - Health
+      operationId: getHealth
+      summary: Check API availability
+      responses:
+        "200":
+          description: API is available
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              examples:
+                success:
+                  summary: Healthy response
+                  value:
+                    success: true
+                    data:
+                      status: ok
+                      service: totem-animal-api
+                      timestamp: "2026-06-08T12:00:00+00:00"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internalServerError:
+                  summary: Internal server error
+                  value:
+                    success: false
+                    error:
+                      code: INTERNAL_SERVER_ERROR
+                      message: Internal server error.
+  /api/me:
+    post:
+      tags:
+        - Client
+      operationId: resolveMe
+      summary: Resolve anonymous client by public_id and restore result if present
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublicIdRequest"
+            examples:
+              withPublicId:
+                summary: Resolve by public_id
+                value:
+                  public_id: 550e8400-e29b-41d4-a716-446655440000
+              withNull:
+                summary: Resolve without public_id
+                value:
+                  public_id: null
+      responses:
+        "200":
+          description: Client resolved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeResponse"
+              examples:
+                withoutResult:
+                  summary: Client without saved result
+                  value:
+                    success: true
+                    data:
+                      public_id: 550e8400-e29b-41d4-a716-446655440000
+                      result:
+                        animal_code: null
+                        animal_name: null
+                        result_title: null
+                        result_description: null
+                        result_image_path: null
+                        user_traits:
+                          extraversion: null
+                          openness: null
+                          self_control: null
+                          agreeableness: null
+                          emotional_stability: null
+                          dominance: null
+                          adaptability: null
+                        animal_traits:
+                          extraversion: null
+                          openness: null
+                          self_control: null
+                          agreeableness: null
+                          emotional_stability: null
+                          dominance: null
+                          adaptability: null
+                        score_distance: null
+                        created_at: null
+                withResult:
+                  summary: Client with restored result
+                  value:
+                    success: true
+                    data:
+                      public_id: 550e8400-e29b-41d4-a716-446655440000
+                      result:
+                        animal_code: wolf
+                        animal_name: Волк
+                        result_title: Твоё тотемное животное — Волк
+                        result_description: Описание результата из snapshot
+                        result_image_path: /images/animals/wolf.webp
+                        user_traits:
+                          extraversion: 72
+                          openness: 61
+                          self_control: 48
+                          agreeableness: 55
+                          emotional_stability: 67
+                          dominance: 59
+                          adaptability: 64
+                        animal_traits:
+                          extraversion: 68
+                          openness: 58
+                          self_control: 52
+                          agreeableness: 54
+                          emotional_stability: 63
+                          dominance: 61
+                          adaptability: 66
+                        score_distance: 4.2
+                        created_at: "2026-06-08T12:00:00+00:00"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                validationError:
+                  summary: Validation error
+                  value:
+                    success: false
+                    error:
+                      code: VALIDATION_ERROR
+                      message: Validation failed.
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internalServerError:
+                  summary: Internal server error
+                  value:
+                    success: false
+                    error:
+                      code: INTERNAL_SERVER_ERROR
+                      message: Internal server error.
+  /api/test/start:
+    post:
+      tags:
+        - Test
+      operationId: startTest
+      summary: Start a test session and return active questions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StartTestRequest"
+            examples:
+              startTest:
+                summary: Start test request
+                value:
+                  public_id: 550e8400-e29b-41d4-a716-446655440000
+      responses:
+        "200":
+          description: Test session started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StartTestResponse"
+              examples:
+                success:
+                  summary: Test questions returned
+                  value:
+                    success: true
+                    data:
+                      public_id: 550e8400-e29b-41d4-a716-446655440000
+                      test_session_id: 123
+                      questions_count: 28
+                      questions:
+                        - code: q01_unknown_company
+                          text: Ты попадаешь в незнакомую компанию. Что делаешь?
+                          answers:
+                            - code: a
+                              text: Быстро нахожу, с кем поговорить, и вливаюсь в движ
+        "404":
+          description: Client not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                clientNotFound:
+                  summary: Client not found
+                  value:
+                    success: false
+                    error:
+                      code: CLIENT_NOT_FOUND
+                      message: Client not found.
+        "409":
+          description: Result already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                resultAlreadyExists:
+                  summary: Result already exists
+                  value:
+                    success: false
+                    error:
+                      code: RESULT_ALREADY_EXISTS
+                      message: Result already exists.
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                validationError:
+                  summary: Validation error
+                  value:
+                    success: false
+                    error:
+                      code: VALIDATION_ERROR
+                      message: Validation failed.
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                questionsNotConfigured:
+                  summary: Questions are not configured
+                  value:
+                    success: false
+                    error:
+                      code: QUESTIONS_NOT_CONFIGURED
+                      message: Questions are not configured.
+                internalServerError:
+                  summary: Internal server error
+                  value:
+                    success: false
+                    error:
+                      code: INTERNAL_SERVER_ERROR
+                      message: Internal server error.
+  /api/test/finish:
+    post:
+      tags:
+        - Test
+      operationId: finishTest
+      summary: Finish a test session, calculate the result, and return the saved snapshot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FinishTestRequest"
+            examples:
+              finishTest:
+                summary: Finish test request
+                value:
+                  public_id: 550e8400-e29b-41d4-a716-446655440000
+                  test_session_id: 123
+                  answers:
+                    - question_code: q01_unknown_company
+                      answer_code: a
+                    - question_code: q02_conflict
+                      answer_code: c
+      responses:
+        "200":
+          description: Test session finished and result stored
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FinishTestResponse"
+              examples:
+                success:
+                  summary: Saved result snapshot
+                  value:
+                    success: true
+                    data:
+                      public_id: 550e8400-e29b-41d4-a716-446655440000
+                      test_session_id: 123
+                      result:
+                        animal_code: wolf
+                        animal_name: Волк
+                        result_title: Твоё тотемное животное — Волк
+                        result_description: Описание результата из snapshot
+                        result_image_path: /images/animals/wolf.webp
+                        user_traits:
+                          extraversion: 72
+                          openness: 61
+                          self_control: 48
+                          agreeableness: 55
+                          emotional_stability: 67
+                          dominance: 59
+                          adaptability: 64
+                        animal_traits:
+                          extraversion: 68
+                          openness: 58
+                          self_control: 52
+                          agreeableness: 54
+                          emotional_stability: 63
+                          dominance: 61
+                          adaptability: 66
+                        score_distance: 4.2
+                        created_at: "2026-06-08T12:00:00+00:00"
+        "404":
+          description: Client or test session not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                clientNotFound:
+                  summary: Client not found
+                  value:
+                    success: false
+                    error:
+                      code: CLIENT_NOT_FOUND
+                      message: Client not found.
+                testSessionNotFound:
+                  summary: Test session not found
+                  value:
+                    success: false
+                    error:
+                      code: TEST_SESSION_NOT_FOUND
+                      message: Test session not found.
+        "409":
+          description: Test session or result state conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                testSessionAlreadyCompleted:
+                  summary: Test session already completed
+                  value:
+                    success: false
+                    error:
+                      code: TEST_SESSION_ALREADY_COMPLETED
+                      message: Test session already completed.
+                resultAlreadyExists:
+                  summary: Result already exists
+                  value:
+                    success: false
+                    error:
+                      code: RESULT_ALREADY_EXISTS
+                      message: Result already exists.
+        "422":
+          description: Validation or answer payload error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                validationError:
+                  summary: Validation error
+                  value:
+                    success: false
+                    error:
+                      code: VALIDATION_ERROR
+                      message: Validation failed.
+                invalidAnswers:
+                  summary: Invalid answers
+                  value:
+                    success: false
+                    error:
+                      code: INVALID_ANSWERS
+                      message: Invalid answers.
+                duplicateAnswers:
+                  summary: Duplicate answers
+                  value:
+                    success: false
+                    error:
+                      code: DUPLICATE_ANSWERS
+                      message: Duplicate answers.
+                answersCountMismatch:
+                  summary: Answers count mismatch
+                  value:
+                    success: false
+                    error:
+                      code: ANSWERS_COUNT_MISMATCH
+                      message: Answers count mismatch.
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                animalsNotConfigured:
+                  summary: Animals are not configured
+                  value:
+                    success: false
+                    error:
+                      code: ANIMALS_NOT_CONFIGURED
+                      message: Animals are not configured.
+                internalServerError:
+                  summary: Internal server error
+                  value:
+                    success: false
+                    error:
+                      code: INTERNAL_SERVER_ERROR
+                      message: Internal server error.
+  /api/result/{public_id}:
+    get:
+      tags:
+        - Result
+      operationId: getResult
+      summary: Get previously saved result snapshot by public_id
+      parameters:
+        - name: public_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Result snapshot returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResultResponse"
+              examples:
+                success:
+                  summary: Stored result snapshot
+                  value:
+                    success: true
+                    data:
+                      public_id: 550e8400-e29b-41d4-a716-446655440000
+                      result:
+                        animal_code: wolf
+                        animal_name: Волк
+                        result_title: Твоё тотемное животное — Волк
+                        result_description: Описание результата из snapshot
+                        result_image_path: /images/animals/wolf.webp
+                        user_traits:
+                          extraversion: 72
+                          openness: 61
+                          self_control: 48
+                          agreeableness: 55
+                          emotional_stability: 67
+                          dominance: 59
+                          adaptability: 64
+                        animal_traits:
+                          extraversion: 68
+                          openness: 58
+                          self_control: 52
+                          agreeableness: 54
+                          emotional_stability: 63
+                          dominance: 61
+                          adaptability: 66
+                        score_distance: 4.2
+                        created_at: "2026-06-08T12:00:00+00:00"
+        "404":
+          description: Client or result not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                clientNotFound:
+                  summary: Client not found
+                  value:
+                    success: false
+                    error:
+                      code: CLIENT_NOT_FOUND
+                      message: Client not found.
+                resultNotFound:
+                  summary: Result not found
+                  value:
+                    success: false
+                    error:
+                      code: RESULT_NOT_FOUND
+                      message: Result not found.
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                validationError:
+                  summary: Validation error
+                  value:
+                    success: false
+                    error:
+                      code: VALIDATION_ERROR
+                      message: Validation failed.
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internalServerError:
+                  summary: Internal server error
+                  value:
+                    success: false
+                    error:
+                      code: INTERNAL_SERVER_ERROR
+                      message: Internal server error.
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+      properties:
+        success:
+          type: boolean
+          enum:
+            - false
+        error:
+          $ref: "#/components/schemas/ErrorObject"
+    ErrorObject:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+    HealthResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          enum:
+            - true
+        data:
+          $ref: "#/components/schemas/HealthData"
+    HealthData:
+      type: object
+      required:
+        - status
+        - service
+        - timestamp
+      properties:
+        status:
+          type: string
+          enum:
+            - ok
+        service:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+    PublicIdRequest:
+      type: object
+      required:
+        - public_id
+      properties:
+        public_id:
+          type:
+            - string
+            - "null"
+          format: uuid
+    MeResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          enum:
+            - true
+        data:
+          $ref: "#/components/schemas/MeData"
+    MeData:
+      type: object
+      required:
+        - public_id
+        - result
+      properties:
+        public_id:
+          type: string
+          format: uuid
+        result:
+          $ref: "#/components/schemas/NullableTotemResult"
+    StartTestRequest:
+      type: object
+      required:
+        - public_id
+      properties:
+        public_id:
+          type: string
+          format: uuid
+    StartTestResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          enum:
+            - true
+        data:
+          $ref: "#/components/schemas/StartTestData"
+    StartTestData:
+      type: object
+      required:
+        - public_id
+        - test_session_id
+        - questions_count
+        - questions
+      properties:
+        public_id:
+          type: string
+          format: uuid
+        test_session_id:
+          type: integer
+          minimum: 1
+        questions_count:
+          type: integer
+          minimum: 1
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Question"
+    Question:
+      type: object
+      required:
+        - code
+        - text
+        - answers
+      properties:
+        code:
+          type: string
+        text:
+          type: string
+        answers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Answer"
+          minItems: 1
+    Answer:
+      type: object
+      required:
+        - code
+        - text
+      properties:
+        code:
+          type: string
+        text:
+          type: string
+    FinishTestRequest:
+      type: object
+      required:
+        - public_id
+        - test_session_id
+        - answers
+      properties:
+        public_id:
+          type: string
+          format: uuid
+        test_session_id:
+          type: integer
+          minimum: 1
+        answers:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/UserAnswer"
+    UserAnswer:
+      type: object
+      required:
+        - question_code
+        - answer_code
+      properties:
+        question_code:
+          type: string
+        answer_code:
+          type: string
+    FinishTestResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          enum:
+            - true
+        data:
+          $ref: "#/components/schemas/FinishTestData"
+    FinishTestData:
+      type: object
+      required:
+        - public_id
+        - test_session_id
+        - result
+      properties:
+        public_id:
+          type: string
+          format: uuid
+        test_session_id:
+          type: integer
+          minimum: 1
+        result:
+          $ref: "#/components/schemas/TotemResult"
+    ResultResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          enum:
+            - true
+        data:
+          $ref: "#/components/schemas/ResultData"
+    ResultData:
+      type: object
+      required:
+        - public_id
+        - result
+      properties:
+        public_id:
+          type: string
+          format: uuid
+        result:
+          $ref: "#/components/schemas/TotemResult"
+    TotemResult:
+      type: object
+      required:
+        - animal_code
+        - animal_name
+        - result_title
+        - result_description
+        - result_image_path
+        - user_traits
+        - animal_traits
+        - score_distance
+        - created_at
+      properties:
+        animal_code:
+          type: string
+        animal_name:
+          type: string
+        result_title:
+          type: string
+        result_description:
+          type: string
+        result_image_path:
+          type: string
+        user_traits:
+          $ref: "#/components/schemas/UserTraits"
+        animal_traits:
+          $ref: "#/components/schemas/AnimalTraits"
+        score_distance:
+          type: number
+          format: float
+        created_at:
+          type: string
+          format: date-time
+    NullableTotemResult:
+      type: object
+      required:
+        - animal_code
+        - animal_name
+        - result_title
+        - result_description
+        - result_image_path
+        - user_traits
+        - animal_traits
+        - score_distance
+        - created_at
+      properties:
+        animal_code:
+          type:
+            - string
+            - "null"
+        animal_name:
+          type:
+            - string
+            - "null"
+        result_title:
+          type:
+            - string
+            - "null"
+        result_description:
+          type:
+            - string
+            - "null"
+        result_image_path:
+          type:
+            - string
+            - "null"
+        user_traits:
+          $ref: "#/components/schemas/NullableUserTraits"
+        animal_traits:
+          $ref: "#/components/schemas/NullableAnimalTraits"
+        score_distance:
+          type:
+            - number
+            - "null"
+          format: float
+        created_at:
+          type:
+            - string
+            - "null"
+          format: date-time
+    UserTraits:
+      type: object
+      required:
+        - extraversion
+        - openness
+        - self_control
+        - agreeableness
+        - emotional_stability
+        - dominance
+        - adaptability
+      properties:
+        extraversion:
+          type: integer
+          minimum: 0
+          maximum: 100
+        openness:
+          type: integer
+          minimum: 0
+          maximum: 100
+        self_control:
+          type: integer
+          minimum: 0
+          maximum: 100
+        agreeableness:
+          type: integer
+          minimum: 0
+          maximum: 100
+        emotional_stability:
+          type: integer
+          minimum: 0
+          maximum: 100
+        dominance:
+          type: integer
+          minimum: 0
+          maximum: 100
+        adaptability:
+          type: integer
+          minimum: 0
+          maximum: 100
+    AnimalTraits:
+      type: object
+      required:
+        - extraversion
+        - openness
+        - self_control
+        - agreeableness
+        - emotional_stability
+        - dominance
+        - adaptability
+      properties:
+        extraversion:
+          type: integer
+          minimum: 0
+          maximum: 100
+        openness:
+          type: integer
+          minimum: 0
+          maximum: 100
+        self_control:
+          type: integer
+          minimum: 0
+          maximum: 100
+        agreeableness:
+          type: integer
+          minimum: 0
+          maximum: 100
+        emotional_stability:
+          type: integer
+          minimum: 0
+          maximum: 100
+        dominance:
+          type: integer
+          minimum: 0
+          maximum: 100
+        adaptability:
+          type: integer
+          minimum: 0
+          maximum: 100
+    NullableUserTraits:
+      type: object
+      required:
+        - extraversion
+        - openness
+        - self_control
+        - agreeableness
+        - emotional_stability
+        - dominance
+        - adaptability
+      properties:
+        extraversion:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          maximum: 100
+        openness:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          maximum: 100
+        self_control:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          maximum: 100
+        agreeableness:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          maximum: 100
+        emotional_stability:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          maximum: 100
+        dominance:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          maximum: 100
+        adaptability:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          maximum: 100
+    NullableAnimalTraits:
+      type: object
+      required:
+        - extraversion
+        - openness
+        - self_control
+        - agreeableness
+        - emotional_stability
+        - dominance
+        - adaptability
+      properties:
+        extraversion:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          maximum: 100
+        openness:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          maximum: 100
+        self_control:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          maximum: 100
+        agreeableness:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          maximum: 100
+        emotional_stability:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          maximum: 100
+        dominance:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          maximum: 100
+        adaptability:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          maximum: 100
